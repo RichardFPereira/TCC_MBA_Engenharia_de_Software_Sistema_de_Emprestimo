@@ -10,10 +10,6 @@ obj/
 packages/
 *.nupkg
 
-# Arquivos de build do Entity Framework Core
-**/Migrations/*/*.Designer.cs
-**/Migrations/*/*.cs
-
 # Arquivos de configuração sensíveis
 appsettings.Development.json
 appsettings.json
@@ -31,8 +27,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Arquivos de build do React
-Frontend/sistema-gerenciamento-emprestimo-client/build/
-Frontend/sistema-gerenciamento-emprestimo-client/dist/
+Frontend/ReactApp/build/
+Frontend/ReactApp/dist/
 
 # Arquivos de ambiente do React
 .env
