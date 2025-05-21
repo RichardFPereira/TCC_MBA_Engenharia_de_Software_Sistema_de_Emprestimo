@@ -10,7 +10,7 @@ namespace Backend.UsuarioService.Models.Entities
     {
         public int Id { get; set; }
         [Required]
-        [StringLenth(100)]
+        [StringLength(100)]
         public string Email { get; set; }
         [Required]
         public string SenhaHash { get; set; }
