@@ -1,0 +1,13 @@
+{
+  "name": "TCC_SistemaEmprestimo",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "sqlserver",
+  "workspaceFolder": "/workspaces/TCC_SistemaEmprestimo",
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:1": {
+      "version": "8.0"
+    }
+  },
+  "forwardPorts": [1433],
+  "postCreateCommand": "dotnet restore Backend/UsuarioService/UsuarioService.csproj && cp Backend/UsuarioService/appsettings.example.json Backend/UsuarioService/appsettings.json && dotnet tool install --global dotnet-ef"
+}
