@@ -6,7 +6,7 @@ namespace Backend.UsuarioService.Interfaces
     {
         Task<Usuario?> GetByCPFAsync(string cpf);
         Task<Usuario?> GetByIdAsync(int id);
-        Task<Usuario?> GetCredencialByEmailAsync(string email);
+        Task<Credencial?> GetCredencialByEmailAsync(string email);
         Task AddUsuarioAsync(Usuario usuario, Credencial credencial);
     }
 }
