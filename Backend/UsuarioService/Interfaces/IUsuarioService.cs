@@ -1,8 +1,10 @@
+using Backend.UsuarioService.DTOs;
+
 namespace Backend.UsuarioService.Interfaces
 {
     public interface IUsuarioService
     {
-        Task<object> CadastrarAsync(object dto);
-        Task<object> LoginAsync(object loginDto);
+        Task<object> CadastrarAsync(CreateUsuarioDTO dto);
+        Task<object> LoginAsync(LoginDTO loginDto);
     }
 }
