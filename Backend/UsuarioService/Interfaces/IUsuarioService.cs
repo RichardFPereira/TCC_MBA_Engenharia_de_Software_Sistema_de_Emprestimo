@@ -4,7 +4,7 @@ namespace Backend.UsuarioService.Interfaces
 {
     public interface IUsuarioService
     {
-        Task<object> CadastrarAsync(CreateUsuarioDTO dto);
-        Task<object> LoginAsync(LoginDTO loginDto);
+        Task<UsuarioResponseDTO> CadastrarAsync(CreateUsuarioDTO dto);
+        Task<UsuarioResponseDTO> LoginAsync(LoginDTO loginDto);
     }
 }
