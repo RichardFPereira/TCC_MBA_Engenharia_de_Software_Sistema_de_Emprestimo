@@ -38,7 +38,7 @@ namespace Backend.UsuarioService.Controllers
         {
             try
             {
-                var response = _service.LoginAsync(dto);
+                var response = await _service.LoginAsync(dto);
                 return Ok(response);
             }
             catch (UnauthorizedAccessException ex)
