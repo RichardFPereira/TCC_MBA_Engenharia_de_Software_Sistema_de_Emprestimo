@@ -1,54 +1,56 @@
 using Backend.UsuarioService.DTOs;
 using Backend.UsuarioService.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
-namespace Backend.UsuarioService.Controllers
+namespace Backend.UsuarioService.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class UsuariosController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UsuariosController : ControllerBase
+    private readonly IUsuarioService _service;
+
+    public UsuariosController(IUsuarioService service)
     {
-        private readonly IUsuarioService _service;
+        _service = service;
+    }
 
-        public UsuariosController(IUsuarioService service)
+    [HttpPost("cadastro")]
+    public async Task<ActionResult<UsuarioResponseDTO>> Cadastrar([FromBody] CreateUsuarioDTO dto)
+    {
+        try
         {
-            _service = service;
+            var response = await _service.CadastrarAsync(dto);
+            return CreatedAtAction(nameof(Cadastrar), new { id = response.Id }, response);
         }
-
-        [HttpPost("Cadastro")]
-        public async Task<ActionResult<UsuarioResponseDTO>> Cadastrar([FromBody] CreateUsuarioDTO dto)
+        catch (InvalidOperationException ex)
         {
-            try
-            {
-                var response = await _service.CadastrarAsync(dto);
-                return CreatedAtAction(nameof(Cadastrar), new { id = response.Id }, response);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Erro interno no servidor.");
-            }
+            return BadRequest(ex.Message);
         }
-
-        [HttpPost("login")]
-        public async Task<ActionResult<UsuarioResponseDTO>> Login([FromBody] LoginDTO dto)
+        catch (Exception ex)
         {
-            try
-            {
-                var response = await _service.LoginAsync(dto);
-                return Ok(response);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Erro interno no servidor.");
-            }
+            return StatusCode(500, "Erro interno no servidor.");
+        }
+    }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginDTO dto)
+    {
+        try
+        {
+            var response = await _service.LoginAsync(dto);
+            return Ok(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Erro interno no servidor.");
         }
     }
 }

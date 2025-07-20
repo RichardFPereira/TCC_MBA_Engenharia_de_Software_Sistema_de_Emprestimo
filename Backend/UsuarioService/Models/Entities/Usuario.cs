@@ -14,9 +14,13 @@ namespace Backend.UsuarioService.Models.Entities
         public string Nome { get; set; }
         [Required]
         [StringLength(11)]
-        public string CPF { get; set; }        
+        public string CPF { get; set; }
         public DateTime? DataNascimento { get; set; }
         public DateTime DataCadastro { get; set; }
         public DateTime DataAlteracao { get; set; }
+        public decimal Salario { get; set; }
+        public decimal Reserva { get; set; }
+        public string Role { get; set; } = "Participante";
+        public Credencial Credencial { get; set; } = null!;
     }
 }
