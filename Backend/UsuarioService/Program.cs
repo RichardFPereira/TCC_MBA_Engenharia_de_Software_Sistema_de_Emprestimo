@@ -16,6 +16,12 @@ builder.Services.AddDbContext<UsuarioDbContext>(options =>
 
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IEmprestimoRepository, EmprestimoRepository>();
+builder.Services.AddScoped<IEmprestimoService, EmprestimoService>();
+builder.Services.AddScoped<IConfiguracaoRepository, ConfiguracaoRepository>();
+builder.Services.AddScoped<IConfiguracaoService, ConfiguracaoService>();
+builder.Services.AddScoped<ILogAcoesRepository, LogAcoesRepository>();
+builder.Services.AddScoped<ILogAcoesService, LogAcoesService>();
 
 builder.Services.AddAuthentication(options =>
 {

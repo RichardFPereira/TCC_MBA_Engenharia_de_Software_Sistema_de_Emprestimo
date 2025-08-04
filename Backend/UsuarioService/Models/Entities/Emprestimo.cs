@@ -15,9 +15,9 @@ namespace Backend.UsuarioService.Models.Entities
         public decimal TaxaJuros { get; set; }
         public DateTime DataEmprestimo { get; set; }
         public string Status { get; set; } = "Pendente";
-        public DateOnly DataCadastro { get; set; }
-        public DateOnly DataAlteracao { get; set; }
+        public DateTime DataCadastro { get; set; }
+        public DateTime DataAlteracao { get; set; }
 
-        public Usuario Usuario { get; set; } = null;
+        public Usuario Usuario { get; set; } = null!;
     }
 }
