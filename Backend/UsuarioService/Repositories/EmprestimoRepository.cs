@@ -59,4 +59,21 @@ public class EmprestimoRepository : IEmprestimoRepository
         _context.Emprestimos.Update(emprestimo);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<Parcela?> GetParcelaByIdAsync(int parcelaId)
+    {
+        return await _context.Parcelas.FindAsync(parcelaId);
+    }
+
+    public async Task UpdateParcelaAsync(Parcela parcela)
+    {
+        _context.Parcelas.Update(parcela);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> AllParcelasPagasAsync(int emprestimoId)
+    {
+        return !await _context.Parcelas
+            .AnyAsync(p => p.EmprestimoId == emprestimoId && p.Status != "Pago");
+    }
 }

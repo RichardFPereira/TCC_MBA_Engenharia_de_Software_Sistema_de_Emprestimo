@@ -2,6 +2,7 @@ using Backend.UsuarioService.DTOs;
 using Backend.UsuarioService.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Backend.UsuarioService.Controllers;
@@ -25,7 +26,11 @@ public class EmprestimosController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var response = await _emprestimoService.CriarEmprestimoAsync(dto);
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int authenticatedUserId))
+            return Unauthorized("Usuário não autenticado corretamente.");
+
+        var response = await _emprestimoService.CriarEmprestimoAsync(authenticatedUserId, dto);
         return CreatedAtAction(nameof(GetEmprestimoById), new { id = response.Id }, response);
     }
 
@@ -53,5 +58,16 @@ public class EmprestimosController : ControllerBase
         if (emprestimo == null || !emprestimo.Any())
             return NotFound();
         return Ok(emprestimo.First());
+    }
+
+    [HttpPut("{emprestimoId}/parcelas/{parcelaId}/status")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> AtualizarStatusParcela(int emprestimoId, int parcelaId, [FromBody] UpdateParcelaStatusDTO dto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _emprestimoService.AtualizarStatusParcelaAsync(emprestimoId, parcelaId, dto);
+        return Ok(response);
     }
 }

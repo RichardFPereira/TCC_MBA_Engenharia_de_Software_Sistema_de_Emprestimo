@@ -6,7 +6,8 @@ namespace Backend.UsuarioService.Interfaces;
 
 public interface IEmprestimoService
 {
-    Task<EmprestimoResponseDTO> CriarEmprestimoAsync(CreateEmprestimoDTO dto);
+    Task<EmprestimoResponseDTO> CriarEmprestimoAsync(int usuarioId, CreateEmprestimoDTO dto);
     Task<List<EmprestimoResponseDTO>> ListarEmprestimosPorUsuarioAsync(int usuarioId);
     Task<EmprestimoResponseDTO> AutorizarEmprestimoAsync(int id, bool autorizar);
+    Task<ParcelaResponseDTO> AtualizarStatusParcelaAsync(int emprestimoId, int parcelaId, UpdateParcelaStatusDTO dto);
 }

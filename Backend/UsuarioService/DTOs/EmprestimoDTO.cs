@@ -4,9 +4,6 @@ namespace Backend.UsuarioService.DTOs;
 
 public class CreateEmprestimoDTO
 {
-    [Required(ErrorMessage = "O ID do usuário é obrigatório.")]
-    public int UsuarioId { get; set; }
-
     [Required(ErrorMessage = "O valor é obrigatório.")]
     [Range(0.01, double.MaxValue, ErrorMessage = "O valor deve ser maior que zero.")]
     public decimal Valor { get; set; }
@@ -39,4 +36,11 @@ public class ParcelaResponseDTO
     public DateTime DataVencimento { get; set; }
     public string Status { get; set; } = string.Empty;
     public DateTime? DataPagamento { get; set; }
+}
+
+public class UpdateParcelaStatusDTO
+{
+    [Required(ErrorMessage = "O status é obrigatório.")]
+    [RegularExpression("Atrasado|Pago", ErrorMessage = "O status deve ser 'Atrasado' ou 'Pago'.")]
+    public string Status { get; set; } = string.Empty;
 }

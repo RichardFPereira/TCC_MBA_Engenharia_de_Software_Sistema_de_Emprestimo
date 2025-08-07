@@ -20,16 +20,16 @@ public class EmprestimoService : IEmprestimoService
         _logAcoesRepository = logAcoesRepository;
     }
 
-    public async Task<EmprestimoResponseDTO> CriarEmprestimoAsync(CreateEmprestimoDTO dto)
+    public async Task<EmprestimoResponseDTO> CriarEmprestimoAsync(int usuarioId, CreateEmprestimoDTO dto)
     {
-        var usuario = await _emprestimoRepository.GetUsuarioByIdAsync(dto.UsuarioId);
+        var usuario = await _emprestimoRepository.GetUsuarioByIdAsync(usuarioId);
         if (usuario == null)
             throw new InvalidOperationException("Usuário não encontrado.");
 
         if (usuario.Role != "Participante")
             throw new InvalidOperationException("Apenas participantes podem solicitar empréstimos.");
 
-        if (await _emprestimoRepository.HasEmprestimoAtivoAsync(dto.UsuarioId))
+        if (await _emprestimoRepository.HasEmprestimoAtivoAsync(usuarioId))
             throw new InvalidOperationException("Usuário já possui um empréstimo ativo.");
 
         var configuracao = await _configuracaoRepository.GetConfiguracaoMaisRecenteAsync();
@@ -50,7 +50,7 @@ public class EmprestimoService : IEmprestimoService
 
         var emprestimo = new Emprestimo
         {
-            UsuarioId = dto.UsuarioId,
+            UsuarioId = usuarioId,
             Valor = dto.Valor,
             ValorTotal = valorTotal,
             NumeroParcelas = dto.NumeroParcelas,
@@ -132,7 +132,7 @@ public class EmprestimoService : IEmprestimoService
 
         await _logAcoesRepository.AddLogAcaoAsync(new LogAcoes
         {
-            AdministradorId = emprestimo.UsuarioId, // Ajustar para administrador logado na Etapa 3
+            AdministradorId = emprestimo.UsuarioId, // Ajustar para administrador logado
             Acao = autorizar ? "Autorizar Empréstimo" : "Rejeitar Empréstimo",
             Detalhes = $"Empréstimo ID {id} {emprestimo.Status} para usuário ID {emprestimo.UsuarioId}",
             Data = DateTime.UtcNow
@@ -150,6 +150,53 @@ public class EmprestimoService : IEmprestimoService
             DataEmprestimo = emprestimo.DataEmprestimo,
             Status = emprestimo.Status,
             DataCadastro = emprestimo.DataCadastro
+        };
+    }
+
+    public async Task<ParcelaResponseDTO> AtualizarStatusParcelaAsync(int emprestimoId, int parcelaId, UpdateParcelaStatusDTO dto)
+    {
+        var parcela = await _emprestimoRepository.GetParcelaByIdAsync(parcelaId);
+        if (parcela == null || parcela.EmprestimoId != emprestimoId)
+            throw new InvalidOperationException("Parcela não encontrada ou não pertence ao empréstimo.");
+
+        if (parcela.Status == "Pago")
+            throw new InvalidOperationException("Parcela já foi paga.");
+
+        parcela.Status = dto.Status;
+        if (dto.Status == "Pago")
+            parcela.DataPagamento = DateTime.UtcNow;
+
+        await _emprestimoRepository.UpdateParcelaAsync(parcela);
+
+        // Verificar se todas as parcelas estão pagas e atualizar o empréstimo
+        if (await _emprestimoRepository.AllParcelasPagasAsync(emprestimoId))
+        {
+            var emprestimo = await _emprestimoRepository.GetEmprestimoByIdAsync(emprestimoId);
+            if (emprestimo != null && emprestimo.Status != "Pago")
+            {
+                emprestimo.Status = "Pago";
+                emprestimo.DataAlteracao = DateTime.UtcNow;
+                await _emprestimoRepository.UpdateEmprestimoAsync(emprestimo);
+
+                await _logAcoesRepository.AddLogAcaoAsync(new LogAcoes
+                {
+                    AdministradorId = emprestimo.UsuarioId, // Ajustar para administrador logado
+                    Acao = "Fechar Empréstimo",
+                    Detalhes = $"Empréstimo ID {emprestimoId} marcado como Pago",
+                    Data = DateTime.UtcNow
+                });
+            }
+        }
+
+        return new ParcelaResponseDTO
+        {
+            Id = parcela.Id,
+            EmprestimoId = parcela.EmprestimoId,
+            NumeroParcela = parcela.NumeroParcela,
+            ValorParcela = parcela.ValorParcela,
+            DataVencimento = parcela.DataVencimento,
+            Status = parcela.Status,
+            DataPagamento = parcela.DataPagamento
         };
     }
 }

@@ -12,4 +12,7 @@ public interface IEmprestimoRepository
     Task<Usuario?> GetUsuarioByIdAsync(int usuarioId);
     Task<bool> HasEmprestimoAtivoAsync(int usuarioId);
     Task UpdateEmprestimoAsync(Emprestimo emprestimo);
+    Task<Parcela?> GetParcelaByIdAsync(int parcelaId);
+    Task UpdateParcelaAsync(Parcela parcela);
+    Task<bool> AllParcelasPagasAsync(int emprestimoId);
 }
