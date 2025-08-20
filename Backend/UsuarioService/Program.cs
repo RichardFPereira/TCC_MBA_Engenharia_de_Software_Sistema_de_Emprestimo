@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,19 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAll", policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+    });
+}
 
 builder.Services.AddAuthorization();
 
@@ -78,6 +92,17 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+if (builder.Environment.IsDevelopment())
+{
+    app.UseCors("AllowAll");
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("CORS disabled in development mode with AllowAnyOrigin");
+}
+else
+{
+    app.UseCors("Default");
+}
 
 if (app.Environment.IsDevelopment())
 {
