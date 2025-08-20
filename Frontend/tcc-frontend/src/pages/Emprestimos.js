@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "../styles.css";
 
 function Emprestimos() {
   const [emprestimos, setEmprestimos] = useState([]);
@@ -9,13 +10,20 @@ function Emprestimos() {
   useEffect(() => {
     const fetchEmprestimos = async () => {
       const token = localStorage.getItem("token");
-      const response = await axios.get(
-        "http://127.0.0.1:5003/api/Emprestimos/usuario/2",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setEmprestimos(response.data);
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:5003/api/Emprestimos/usuario/2",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setEmprestimos(response.data);
+      } catch (error) {
+        console.error(
+          "Erro ao buscar empréstimos:",
+          error.response ? error.response.data : error.message
+        );
+      }
     };
     fetchEmprestimos();
   }, []);
@@ -23,31 +31,38 @@ function Emprestimos() {
   const handleCriarEmprestimo = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-    await axios.post(
-      "http://127.0.0.1:5003/api/Emprestimos",
-      {
-        valor: parseFloat(valor),
-        numeroParcelas: parseInt(numeroParcelas),
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    alert("Empréstimo criado!");
-    window.location.reload();
+    try {
+      await axios.post(
+        "http://127.0.0.1:5003/api/Emprestimos",
+        {
+          valor: parseFloat(valor),
+          numeroParcelas: parseInt(numeroParcelas),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert("Empréstimo criado!");
+      window.location.reload();
+    } catch (error) {
+      console.error(
+        "Erro ao criar empréstimo:",
+        error.response ? error.response.data : error.message
+      );
+    }
   };
 
   return (
-    <div>
+    <div className="emprestimos-container">
       <h2>Meus Empréstimos</h2>
-      <ul>
+      <ul className="emprestimos-list">
         {emprestimos.map((emp) => (
           <li key={emp.Id}>
             {emp.Valor} - {emp.Status}
           </li>
         ))}
       </ul>
-      <form onSubmit={handleCriarEmprestimo}>
+      <form className="emprestimos-form" onSubmit={handleCriarEmprestimo}>
         <input
           type="number"
           value={valor}
