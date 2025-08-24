@@ -6,6 +6,8 @@ function Emprestimos() {
   const [emprestimos, setEmprestimos] = useState([]);
   const [valor, setValor] = useState("");
   const [numeroParcelas, setNumeroParcelas] = useState("");
+  const [temEmprestimoEmAndamento, setTemEmprestimoEmAndamento] =
+    useState(false);
 
   useEffect(() => {
     const fetchEmprestimos = async () => {
@@ -17,7 +19,15 @@ function Emprestimos() {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setEmprestimos(response.data);
+        console.log("Resposta da API:", response.data);
+        const data = response.data;
+        setEmprestimos(data);
+
+        setTemEmprestimoEmAndamento(
+          data.some(
+            (emp) => emp.status === "Pendente" || emp.status === "Em Andamento"
+          )
+        );
       } catch (error) {
         console.error(
           "Erro ao buscar empréstimos:",
@@ -49,6 +59,9 @@ function Emprestimos() {
         "Erro ao criar empréstimo:",
         error.response ? error.response.data : error.message
       );
+      alert(
+        "Erro: Não é possível criar um novo empréstimo enquanto houver um em andamento."
+      );
     }
   };
 
@@ -56,26 +69,41 @@ function Emprestimos() {
     <div className="emprestimos-container">
       <h2>Meus Empréstimos</h2>
       <ul className="emprestimos-list">
-        {emprestimos.map((emp) => (
-          <li key={emp.Id}>
-            {emp.Valor} - {emp.Status}
-          </li>
-        ))}
+        {emprestimos.length > 0 ? (
+          emprestimos.map((emp) => (
+            <li key={emp.id}>
+              ID: {emp.id} - Valor: {emp.valor} - Valor Total: {emp.valorTotal}{" "}
+              - Parcelas: {emp.numeroParcelas} - Status: {emp.status}
+            </li>
+          ))
+        ) : (
+          <li>Nenhum empréstimo em andamento.</li>
+        )}
       </ul>
+      {temEmprestimoEmAndamento && (
+        <p style={{ color: "red" }}>
+          Não é possível solicitar um novo empréstimo enquanto houver um em
+          andamento.
+        </p>
+      )}
       <form className="emprestimos-form" onSubmit={handleCriarEmprestimo}>
         <input
           type="number"
           value={valor}
           onChange={(e) => setValor(e.target.value)}
           placeholder="Valor"
+          disabled={temEmprestimoEmAndamento}
         />
         <input
           type="number"
           value={numeroParcelas}
           onChange={(e) => setNumeroParcelas(e.target.value)}
           placeholder="Parcelas"
+          disabled={temEmprestimoEmAndamento}
         />
-        <button type="submit">Criar Empréstimo</button>
+        <button type="submit" disabled={temEmprestimoEmAndamento}>
+          Criar Empréstimo
+        </button>
       </form>
     </div>
   );
