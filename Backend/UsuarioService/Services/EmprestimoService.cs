@@ -132,7 +132,7 @@ public class EmprestimoService : IEmprestimoService
 
         await _logAcoesRepository.AddLogAcaoAsync(new LogAcoes
         {
-            AdministradorId = emprestimo.UsuarioId, // Ajustar para administrador logado
+            AdministradorId = emprestimo.UsuarioId,
             Acao = autorizar ? "Autorizar Empréstimo" : "Rejeitar Empréstimo",
             Detalhes = $"Empréstimo ID {id} {emprestimo.Status} para usuário ID {emprestimo.UsuarioId}",
             Data = DateTime.UtcNow
@@ -168,7 +168,6 @@ public class EmprestimoService : IEmprestimoService
 
         await _emprestimoRepository.UpdateParcelaAsync(parcela);
 
-        // Verificar se todas as parcelas estão pagas e atualizar o empréstimo
         if (await _emprestimoRepository.AllParcelasPagasAsync(emprestimoId))
         {
             var emprestimo = await _emprestimoRepository.GetEmprestimoByIdAsync(emprestimoId);
@@ -180,7 +179,7 @@ public class EmprestimoService : IEmprestimoService
 
                 await _logAcoesRepository.AddLogAcaoAsync(new LogAcoes
                 {
-                    AdministradorId = emprestimo.UsuarioId, // Ajustar para administrador logado
+                    AdministradorId = emprestimo.UsuarioId,
                     Acao = "Fechar Empréstimo",
                     Detalhes = $"Empréstimo ID {emprestimoId} marcado como Pago",
                     Data = DateTime.UtcNow
@@ -198,5 +197,30 @@ public class EmprestimoService : IEmprestimoService
             Status = parcela.Status,
             DataPagamento = parcela.DataPagamento
         };
+    }
+
+    public async Task<List<object>> GetEmprestimosPendentesAsync()
+    {
+        var emprestimos = await _emprestimoRepository.GetEmprestimosPendentesAsync();
+        var result = new List<object>();
+
+        foreach (var emprestimo in emprestimos)
+        {
+            result.Add(new
+            {
+                id = emprestimo.Id,
+                usuarioId = emprestimo.UsuarioId,
+                nomeUsuario = emprestimo.Usuario?.Nome ?? string.Empty,
+                email = emprestimo.Usuario?.Credencial?.Email ?? string.Empty,
+                valorReserva = emprestimo.Usuario?.Reserva ?? 0m,
+                salario = emprestimo.Usuario?.Salario ?? 0m,
+                valor = emprestimo.Valor,
+                dataEmprestimo = emprestimo.DataEmprestimo,
+                status = emprestimo.Status,
+                numeroParcelas = emprestimo.NumeroParcelas
+            });
+        }
+
+        return result;
     }
 }

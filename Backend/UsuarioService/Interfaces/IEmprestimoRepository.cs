@@ -15,4 +15,5 @@ public interface IEmprestimoRepository
     Task<Parcela?> GetParcelaByIdAsync(int parcelaId);
     Task UpdateParcelaAsync(Parcela parcela);
     Task<bool> AllParcelasPagasAsync(int emprestimoId);
+    Task<List<Emprestimo>> GetEmprestimosPendentesAsync();
 }

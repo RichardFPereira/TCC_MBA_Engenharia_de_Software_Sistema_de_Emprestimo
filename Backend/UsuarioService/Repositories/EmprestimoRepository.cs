@@ -3,6 +3,7 @@ using Backend.UsuarioService.Interfaces;
 using Backend.UsuarioService.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Backend.UsuarioService.Repositories;
@@ -45,7 +46,9 @@ public class EmprestimoRepository : IEmprestimoRepository
 
     public async Task<Usuario?> GetUsuarioByIdAsync(int usuarioId)
     {
-        return await _context.Usuarios.FindAsync(usuarioId);
+        return await _context.Usuarios
+            .Include(u => u.Credencial)
+            .FirstOrDefaultAsync(u => u.Id == usuarioId);
     }
 
     public async Task<bool> HasEmprestimoAtivoAsync(int usuarioId)
@@ -75,5 +78,14 @@ public class EmprestimoRepository : IEmprestimoRepository
     {
         return !await _context.Parcelas
             .AnyAsync(p => p.EmprestimoId == emprestimoId && p.Status != "Pago");
+    }
+
+    public async Task<List<Emprestimo>> GetEmprestimosPendentesAsync()
+    {
+        return await _context.Emprestimos
+            .Include(e => e.Usuario)
+            .ThenInclude(u => u.Credencial)
+            .Where(e => e.Status == "Pendente")
+            .ToListAsync();
     }
 }

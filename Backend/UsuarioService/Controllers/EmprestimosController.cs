@@ -42,6 +42,14 @@ public class EmprestimosController : ControllerBase
         return Ok(emprestimos);
     }
 
+    [HttpGet("pendentes")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> GetEmprestimosPendentes()
+    {
+        var pendentes = await _emprestimoService.GetEmprestimosPendentesAsync();
+        return Ok(pendentes);
+    }
+
     [HttpPut("{id}/autorizar")]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AutorizarEmprestimo(int id, [FromBody] bool autorizar)
@@ -54,7 +62,7 @@ public class EmprestimosController : ControllerBase
     [Authorize(Roles = "Administrador,Participante")]
     public async Task<IActionResult> GetEmprestimoById(int id)
     {
-        var emprestimo = await _emprestimoService.ListarEmprestimosPorUsuarioAsync(id); // Ajustar lógica se necessário
+        var emprestimo = await _emprestimoService.ListarEmprestimosPorUsuarioAsync(id);
         if (emprestimo == null || !emprestimo.Any())
             return NotFound();
         return Ok(emprestimo.First());
