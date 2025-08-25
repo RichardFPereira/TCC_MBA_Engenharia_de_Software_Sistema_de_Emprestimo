@@ -35,9 +35,9 @@ public class UsuarioService : IUsuarioService
             Nome = dto.Nome,
             CPF = dto.CPF,
             DataNascimento = dto.DataNascimento,
-            Salario = dto.Salario,
-            Reserva = dto.Reserva,
-            Role = dto.Role,
+            Salario = dto.Salario ?? 0m,
+            Reserva = dto.Reserva ?? 0m,
+            Role = "Participante",
             DataCadastro = DateTime.UtcNow,
             DataAlteracao = DateTime.UtcNow
         };

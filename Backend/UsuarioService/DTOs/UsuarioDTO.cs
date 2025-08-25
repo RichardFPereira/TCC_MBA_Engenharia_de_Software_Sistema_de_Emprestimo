@@ -23,9 +23,10 @@ public class CreateUsuarioDTO
     [Required(ErrorMessage = "A senha é obrigatória.")]
     [StringLength(20, MinimumLength = 8, ErrorMessage = "A senha deve ter entre 8 e 20 caracteres.")]
     public string Senha { get; set; } = string.Empty;
-    public decimal Salario { get; set; }
-    public decimal Reserva { get; set; }
-    public string Role { get; set; } = "Participante";
+
+    public decimal? Salario { get; set; }
+    public decimal? Reserva { get; set; }
+
 }
 
 public class LoginDTO
