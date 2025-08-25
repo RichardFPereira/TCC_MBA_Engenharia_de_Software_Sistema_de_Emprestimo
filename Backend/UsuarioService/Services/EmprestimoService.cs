@@ -223,4 +223,30 @@ public class EmprestimoService : IEmprestimoService
 
         return result;
     }
+
+    public async Task ProcessarAutorizacoesBatchAsync(List<AutorizacaoBatchDTO> dtoList)
+    {
+        foreach (var dto in dtoList)
+        {
+            var emprestimo = await _emprestimoRepository.GetEmprestimoByIdAsync(dto.Id);
+            if (emprestimo == null)
+                continue;
+
+            if (emprestimo.Status != "Pendente")
+                continue;
+
+            emprestimo.Status = dto.Autorizar ? "Em Andamento" : "Cancelado";
+            emprestimo.DataAlteracao = DateTime.UtcNow;
+
+            await _emprestimoRepository.UpdateEmprestimoAsync(emprestimo);
+
+            await _logAcoesRepository.AddLogAcaoAsync(new LogAcoes
+            {
+                AdministradorId = emprestimo.UsuarioId,
+                Acao = dto.Autorizar ? "Autorizar Empréstimo" : "Rejeitar Empréstimo",
+                Detalhes = $"Empréstimo ID {dto.Id} {emprestimo.Status} para usuário ID {emprestimo.UsuarioId}",
+                Data = DateTime.UtcNow
+            });
+        }
+    }
 }

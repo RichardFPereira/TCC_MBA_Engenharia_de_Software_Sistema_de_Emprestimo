@@ -78,4 +78,12 @@ public class EmprestimosController : ControllerBase
         var response = await _emprestimoService.AtualizarStatusParcelaAsync(emprestimoId, parcelaId, dto);
         return Ok(response);
     }
+
+    [HttpPut("autorizar-batch")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> AutorizarEmprestimosBatch([FromBody] List<AutorizacaoBatchDTO> dtoList)
+    {
+        await _emprestimoService.ProcessarAutorizacoesBatchAsync(dtoList);
+        return Ok();
+    }
 }

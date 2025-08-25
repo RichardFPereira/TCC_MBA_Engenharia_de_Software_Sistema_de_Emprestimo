@@ -11,4 +11,5 @@ public interface IEmprestimoService
     Task<EmprestimoResponseDTO> AutorizarEmprestimoAsync(int id, bool autorizar);
     Task<ParcelaResponseDTO> AtualizarStatusParcelaAsync(int emprestimoId, int parcelaId, UpdateParcelaStatusDTO dto);
     Task<List<object>> GetEmprestimosPendentesAsync();
+    Task ProcessarAutorizacoesBatchAsync(List<AutorizacaoBatchDTO> dtoList);
 }

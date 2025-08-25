@@ -44,3 +44,9 @@ public class UpdateParcelaStatusDTO
     [RegularExpression("Atrasado|Pago", ErrorMessage = "O status deve ser 'Atrasado' ou 'Pago'.")]
     public string Status { get; set; } = string.Empty;
 }
+
+public class AutorizacaoBatchDTO
+{
+    public int Id { get; set; }
+    public bool Autorizar { get; set; }
+}
