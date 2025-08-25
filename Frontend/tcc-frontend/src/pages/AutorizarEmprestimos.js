@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function AutorizarEmprestimos() {
   const [emprestimos, setEmprestimos] = useState([]);
   const [selecoes, setSelecoes] = useState({});
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEmprestimos = async () => {
       const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/");
+        return;
+      }
       try {
         const response = await axios.get(
           "http://127.0.0.1:5003/api/Emprestimos/pendentes",
@@ -17,7 +23,6 @@ function AutorizarEmprestimos() {
           }
         );
         setEmprestimos(response.data);
-
         const initialSelecoes = response.data.reduce(
           (acc, emp) => ({
             ...acc,
@@ -33,7 +38,7 @@ function AutorizarEmprestimos() {
       }
     };
     fetchEmprestimos();
-  }, []);
+  }, [navigate]);
 
   const handleCheckboxChange = (id, tipo) => {
     setSelecoes((prev) => {
@@ -72,12 +77,16 @@ function AutorizarEmprestimos() {
         batchData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       window.location.reload();
     } catch (error) {
       console.error("Erro ao processar autorizações:", error);
       alert("Erro ao salvar as alterações. Verifique o console para detalhes.");
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   if (loading) return <p>Carregando...</p>;
@@ -126,6 +135,7 @@ function AutorizarEmprestimos() {
         </tbody>
       </table>
       <button onClick={handleSalvar}>Salvar Alterações</button>
+      <button onClick={handleLogout}>Sair</button>
     </div>
   );
 }
