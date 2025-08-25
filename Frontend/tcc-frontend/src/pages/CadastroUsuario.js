@@ -20,7 +20,6 @@ function CadastroUsuario() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Cadastro
       await axios.post(
         "http://127.0.0.1:5003/api/Usuarios/cadastro",
         formData,
@@ -33,7 +32,6 @@ function CadastroUsuario() {
         }
       );
 
-      // Login automático
       const loginResponse = await axios.post(
         "http://127.0.0.1:5003/api/Usuarios/login",
         {
@@ -42,10 +40,9 @@ function CadastroUsuario() {
         }
       );
       const { token } = loginResponse.data;
-      localStorage.setItem("token", token); // Armazena o token
+      localStorage.setItem("token", token);
 
       setMessage("Cadastro realizado com sucesso! Redirecionando...");
-      // Redireciona para a página inicial após 1 segundo
       setTimeout(() => navigate("/inicio"), 1000);
     } catch (error) {
       console.error("Erro ao cadastrar ou logar:", error);
