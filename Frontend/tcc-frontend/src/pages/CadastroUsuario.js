@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function CadastroUsuario() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ function CadastroUsuario() {
     senha: "",
   });
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,6 +20,7 @@ function CadastroUsuario() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Cadastro
       await axios.post(
         "http://127.0.0.1:5003/api/Usuarios/cadastro",
         formData,
@@ -29,17 +32,24 @@ function CadastroUsuario() {
           },
         }
       );
-      setMessage("Cadastro realizado com sucesso!");
-      setFormData({
-        nome: "",
-        cpf: "",
-        dataNascimento: "",
-        email: "",
-        senha: "",
-      });
+
+      // Login automático
+      const loginResponse = await axios.post(
+        "http://127.0.0.1:5003/api/Usuarios/login",
+        {
+          email: formData.email,
+          senha: formData.senha,
+        }
+      );
+      const { token } = loginResponse.data;
+      localStorage.setItem("token", token); // Armazena o token
+
+      setMessage("Cadastro realizado com sucesso! Redirecionando...");
+      // Redireciona para a página inicial após 1 segundo
+      setTimeout(() => navigate("/inicio"), 1000);
     } catch (error) {
-      console.error("Erro ao cadastrar:", error);
-      setMessage(error.response?.data || "Erro ao cadastrar usuário.");
+      console.error("Erro ao cadastrar ou logar:", error);
+      setMessage(error.response?.data || "Erro ao cadastrar ou logar usuário.");
     }
   };
 

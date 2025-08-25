@@ -6,6 +6,7 @@ import Admin from "./pages/Admin";
 import Configuracoes from "./pages/Configuracoes";
 import AutorizarEmprestimos from "./pages/AutorizarEmprestimos";
 import CadastroUsuario from "./pages/CadastroUsuario";
+import Inicio from "./pages/Inicio";
 
 function App() {
   return (
@@ -19,7 +20,8 @@ function App() {
           path="/AutorizarEmprestimos"
           element={<AutorizarEmprestimos />}
         />
-        <Route path="/cadastro" element={<CadastroUsuario />} />{" "}
+        <Route path="/cadastro" element={<CadastroUsuario />} />
+        <Route path="/inicio" element={<Inicio />} />
       </Routes>
     </Router>
   );
